@@ -33,24 +33,32 @@ bool processInput(bool continueApplication = true);
 
 GLint vertexShaderID, fragmentShaderID, shaderProgramID;
 GLuint VAO, VBO;
+typedef struct _Vertex {
+	float m_Pos[3];
+	float m_Color[3];
+} Vertex;
 
 // Codigo de los shaders, por ahora se crean en una cadena de texto
 // Shader de vertices
 const GLchar * vertexShaderSource = "#version 330 core\n"
-		"layout (location=0) in vec3 in_position;\n"
-		"void main(){\n"
-		"gl_Position = vec4(in_position, 1.0);\n"
-		"}\0";
+"layout (location=0) in vec3 in_position;\n"
+"layout (location=1) in vec3 in_color;\n"
+"out vec3 our_color;\n"
+"void main(){\n"
+"gl_Position = vec4(in_position, 1.0);\n"
+"our_color=in_color;\n"
+"}\0";
 // Shader de fragmento
 const GLchar * fragmentShaderSource = "#version 330 core\n"
-		"out vec4 color;\n"
-		"void main(){\n"
-		"color = vec4(0.9, 0.4, 0.1, 1.0);\n"
-		"}\0";
+"out vec4 color;\n"
+"in vec3 our_color;\n"
+"void main(){\n"
+"color = vec4(our_color, 1.0);\n"
+"}\0";
 
 // Implementacion de todas las funciones.
 void init(int width, int height, std::string strTitle, bool bFullScreen) {
-	
+
 	if (!glfwInit()) {
 		std::cerr << "Failed to initialize GLFW" << std::endl;
 		exit(-1);
@@ -110,28 +118,219 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	GLchar infoLog[512];
 	// Se obtiene el estatus de la compilacion del vertex shader
 	glGetShaderiv(vertexShaderID, GL_COMPILE_STATUS, &success);
-	if(!success){
+	if (!success) {
 		// En caso de error se obtiene el error y lanza mensaje con error
 		glGetShaderInfoLog(vertexShaderID, 512, NULL, infoLog);
 		std::cout << "Error al compilar el VERTEX_SHADER." << infoLog << std::endl;
 	}
+	//Se crea el id del Fragment Shader
+	fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+	//Se agrega el codigo fuente al ID 
+	glShaderSource(fragmentShaderID, 1, &fragmentShaderSource, NULL);
+	//Compilacion de Fragment Shader 
+	glCompileShader(fragmentShaderID);
+	//Se obtiene el estatus de la compilacion del Fragment Shader
+	glGetShaderiv(fragmentShaderID, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		//En caso de error se obtiene el error y lanza mensaje con error 
+		glGetShaderInfoLog(fragmentShaderID, 512, NULL, infoLog);
+		std::cout << "Error al compilar el FRAGMENT_SHADER." << infoLog << std::endl;
 
+	}
 	// Programa con los shaders
 	shaderProgramID = glCreateProgram();
 	// Se agregan el vertex y fragment shader al program
 	glAttachShader(shaderProgramID, vertexShaderID);
-	// glAttachShader(shaderProgramID, fragmentShaderID);
+	glAttachShader(shaderProgramID, fragmentShaderID);
 	// Proceso de linkeo
 	glLinkProgram(shaderProgramID);
 	// Revision de error de linkeo del programa
 	glGetProgramiv(shaderProgramID, GL_LINK_STATUS, &success);
-	if(!success){
+	if (!success) {
 		glGetProgramInfoLog(shaderProgramID, 512, NULL, infoLog);
 		std::cout << "ERROR al linkear el programa." << infoLog << std::endl;
 	}
 
 	// Se definen los vertices de la geometria a dibujar
-	GLfloat vertices[] = {-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0};
+	//GLfloat vertices[] = {-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0};
+	//Se definen los vertices de la geometria a dibujar 
+	/*Vertex vertices[] =
+	{
+		{ { -0.5f,-0.5f, 0.0f },{ 1.0f, 0.0f, 0.0f } },
+		{ { 0.5f,-0.5f, 0.0f },{ 0.0f, 1.0f, 0.0f } },
+		{ { 0.5f, 0.5f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
+		{ { -0.5f,-0.5f, 0.0f },{ 1.0f, 0.0f, 0.0f } },
+		{ { 0.5f, 0.5f, 0.0f },{ 0.0f, 0.0f, 1.0f } },
+		{ { -0.5f, 0.5f, 0.0f },{ 1.0f, 0.0f, 1.0f } }
+	};*/
+	Vertex vertices[]
+	{
+		/*//ARRIBA 9
+
+		{ { 0.2,0.7,0.0 },{1.0, 0.5, 0.0 } },//p2
+		{ { 0.0,0.85,0.0 },{1.0, 0.5, 0.0 } },//p4
+		{ { -0.2,0.7,0.0 },{1.0, 0.5, 0.0 } },//p1
+		{ { 0.2,0.7,0.0 },{ 1.0, 0.0, 1.0} },//p2
+		{ { 0.0,0.0,0.0 },{ 1.0, 0.0, 1.0}},//p0
+		{ { -0.2,0.7,0.0 },{ 1.0, 0.0, 1.0 } },//p1
+		{ { 0.0,0.0,0.0 },{ 1.0, 0.0, 1.0 }},//p0
+		{ { 0.2,0.7,0.0 },{1.0, 0.5, 0.0 } },//p2
+		{ { 0.0,0.0,0.0 },{ 1.0, 0.0, 1.0 }},//p0
+		// abajo 9
+		{ { 0.2,-0.7,0.0 },{1.0, 0.5, 0.0} },//p6
+		{ { 0.0,-0.85,0.0 },{1.0, 0.5, 0.0} },//p8
+		{ { -0.2,-0.7,0.0 },{1.0, 0.5, 0.0 } },//p5
+		{ { 0.2,-0.7,0.0 },{1.0, 0.0, 1.0} },//p6
+		{ { 0.0,0.0,0.0 },{ 1.0, 0.0, 1.0}},//p0
+		{ { -0.2,-0.7,0.0 },{1.0, 0.0, 1.0} },//p5
+		{ { 0.0,0.0,0.0 },{ 1.0, 0.0, 1.0 }},//p0
+		{ { 0.2,-0.7,0.0 },{1.0, 0.5, 0.0} },//p6
+		{ { 0.0,0.0,0.0 },{ 1.0, 0.0, 1.0 }},//p0
+		// derecha 9
+		{ { 0.7,0.2,0.0 },{1.0, 0.5, 0.0} },//p14/6
+		{ { 0.85,0.0,0.0 },{1.0, 0.5, 0.0} },//p16/8
+		{ { 0.7,-0.2,0.0 },{1.0, 0.5, 0.0} },//p13/5
+		{ { 0.7,0.2,0.0 },{1.0, 0.0, 1.0} },//p14/6
+		{ { 0.0,0.0,0.0 },{ 1.0, 0.0, 1.0 }},//p0
+		{ { 0.7,-0.2,0.0 },{1.0, 0.0, 1.0} },//p13/5
+		{ { 0.0,0.0,0.0 },{ 1.0, 0.5, 0.0 }},//p0
+		{ { 0.7,0.2,0.0 },{1.0, 0.0, 1.0} },//p14/6
+		{ { 0.0,0.0,0.0 },{ 1.0, 0.0, 1.0 }},//p0
+
+		//IZQUIERDA 9
+
+		{ { -0.7,0.2,0.0 },{1.0, 0.5, 0.0} },//p10/14
+		{ { -0.85,0.0,0.0 },{1.0, 0.5, 0.0} },//p12/16
+		{ { -0.7,-0.2,0.0 },{1.0, 0.5, 0.0} },//p9/13
+		{ { -0.7,0.2,0.0 },{1.0, 0.0, 1.0} },//p10/14
+		{ { 0.0,0.0,0.0 },{ 1.0, 0.0, 1.0 }},//p0
+		{ { -0.7,-0.2,0.0 },{1.0, 0.0, 1.0} },//p9/13
+		{ { 0.0,0.0,0.0 },{ 1.0, 0.5, 0.0 }},//p0
+		{ { -0.7,0.2,0.0 },{1.0, 0.0, 1.0} },//p10/14
+		{ { 0.0,0.0,0.0 },{ 1.0, 0.0, 1.0 }},//p0
+
+
+		*/
+		//casa cadrado 7
+		{ { 0.6,0.5,0.0 },{0.5, 1.0, 0.5} },
+		{ { -0.6,0.5,0.0 },{0.5, 1.0, 0.5} },
+		{ { -0.6,-0.6,0.0 },{0.5, 1.0, 0.5} },
+		{ { 0.6,0.5,0.0 },{0.5, 1.0, 0.5} },
+		{ {-0.6,-0.6,0.0 },{0.5, 1.0, 0.5} },
+		{ { 0.6,-0.6,0.0 },{0.5, 1.0, 0.5} },
+		
+		// RECTANGULO CASA 6
+	   { { 0.6,0.5,0.0 },{1.0,0.8,0.14} },
+	   { { 0.6,0.45,0.0 },{1.0,0.8,0.14} },
+	   { { -0.6,0.45,0.0 },{1.0,0.8,0.14} },
+	   { {0.6,0.5,0.0 },{1.0,0.8,0.14} },
+	   { { -0.6,0.45,0.0 },{1.0,0.8,0.14} },
+	   { { -0.6,0.5,0.0 },{1.0,0.8,0.14} },
+	// triangulo casa 3
+	   { { -0.6,0.5,0.0 },{1.0 ,0.5 ,0.0} },
+	   { { 0.0,1.0,0.0 },{1.0 ,0.5 ,0.0} },
+	   { { 0.6,0.5,0.0 },{1.0 ,0.5 ,0.0} },
+	   { { -0.6,0.5,0.0 },{0.5, 1.0, 0.5} },
+	   { { -0.6,-0.5,0.0 },{1.0 ,0.5 ,0.0} },
+	   { { -0.6,0.5,0.0 },{0.5, 1.0, 0.5} },
+	  ///PUERTA7
+	  { { -0.55,0.3,0.0 },{1.0,0.8,0.14} },
+	   { { -0.55,-0.55,0.0 },{1.0,0.8,0.14} },
+	   { { -0.05,-0.55,0.0 },{1.0,0.8,0.14} },
+	  { { -0.55,0.3,0.0 },{1.0,0.8,0.14} },
+	  { { -0.05,-0.55,0.0 },{1.0,0.8,0.14} },
+	  { { -0.05,0.3,0.0 },{1.0,0.8,0.14} },
+	   
+	    // marco puerta 7
+		{ { -0.5,0.25,0.0 },{0.55,0.47,0.14} },
+	   { { -0.5,-0.5,0.0 },{0.55,0.47,0.14} },
+	   { { -0.1,-0.5,0.0 },{0.55,0.47,0.14} },
+	  { { -0.5,0.25,0.0 },{0.55,0.47,0.14} },
+	  { { -0.1,-0.5,0.0 },{0.55,0.47,0.14} },
+	  { { -0.1,0.25,0.0 },{0.55,0.47,0.14} },
+
+	  //marco ventana
+
+		{ { 0.5,-0.15,0.0 },{1.0,0.8,0.14} },
+	   { { 0.5,0.25,0.0 },{1.0,0.8,0.14} },
+	   { { 0.1,0.25,0.0 },{1.0,0.8,0.14} },
+	  { { 0.5,-0.15,0.0 },{1.0,0.8,0.14} },
+	  { { 0.1,0.25,0.0 },{1.0,0.8,0.14} },
+	  { { 0.1,-0.15,0.0 },{1.0,0.8,0.14} },
+	  // ventana
+
+		{ { 0.45,-0.1,0.0 },{0.0,0.0,1.0} },
+	   { { 0.45,0.20,0.0 },{0.0,0.0,1.0} },
+	   { { 0.15,0.20,0.0 },{0.0,0.0,1.0} },
+	  { { 0.45,-0.1,0.0 },{0.0,0.0,1.0} },
+	   { { 0.15,0.20,0.0 },{0.0,0.0,1.0} },
+	  { { 0.15,-0.1,0.0 },{0.0,0.0,1.0} },
+
+	  //base ventana 
+
+	  { { 0.5,-0.2,0.0 },{1.0 ,0.5 ,0.0} },
+	   { { 0.5,-0.15,0.0 },{1.0 ,0.5 ,0.0} },
+	   { { 0.1,-0.15,0.0 },{1.0 ,0.5 ,0.0} },
+	  { { 0.5,-0.2,0.0 },{1.0 ,0.5 ,0.0} },
+	  { { 0.1,-0.15,0.0 },{1.0 ,0.5 ,0.0} },
+	  { { 0.1,-0.2,0.0 },{1.0 ,0.5 ,0.0} },
+
+	  // rec ventana vertical 
+
+		{ { 0.31,-0.1,0.0 },{0.55,0.47,0.14} },
+		{ { 0.31,0.1,0.0 },{0.55,0.47,0.14} },
+		{ { 0.29,0.1,0.0 },{0.55,0.47,0.14} },
+		{ { 0.31,-0.1,0.0 },{0.55,0.47,0.14} },
+		{ { 0.29,0.1,0.0 },{0.55,0.47,0.14} },
+		{ { 0.29,-0.1,0.0 },{0.55,0.47,0.14} },
+	 // rec ventana horizontal 
+		{ { 0.45,0.1,0.0 },{0.55,0.47,0.14} },
+		{ { 0.45,0.11,0.0 },{0.55,0.47,0.14} },
+		{ { 0.15,0.11,0.0 },{0.55,0.47,0.14} },
+		{ { 0.45,0.1,0.0 },{0.55,0.47,0.14} },
+		{ { 0.15,0.11,0.0 },{0.55,0.47,0.14} },
+		{ { 0.15,0.1,0.0 },{0.55,0.47,0.14} },
+		
+	// base
+		{ { 0.8, -0.6, 0.0 }, { 0.0, 0.5, 0.0 } },
+		{ { -0.8,-0.6,0.0 },{0.0, 0.5, 0.0} },
+		{ { -0.8,-0.7,0.0 },{0.0, 0.5, 0.0} },
+		{ { 0.8, -0.6, 0.0 },{0.0, 0.5, 0.0} },
+		{ {-0.8,-0.7,0.0 },{0.0, 0.5, 0.0} },
+		{ {0.8,-0.7,0.0 },{0.0, 0.5, 0.0} },
+	// CUADRADO DE TECHO 
+		{ { 0.08, 0.8, 0.0 }, { 1.0,0.8,0.14 } },
+		{ { -0.08,0.8,0.0 },{1.0,0.8,0.14} },
+		{ { -0.08,0.6,0.0 },{1.0,0.8,0.14} },
+		{ { 0.08, 0.8, 0.0 }, {1.0,0.8,0.14 } },
+		{ { -0.08,0.6,0.0 },{1.0,0.8,0.14} },
+		{ {0.08,0.6,0.0 },{1.0,0.8,0.14} },
+	//Marco cuadrado techo 
+		{ { 0.07, 0.79, 0.0 }, {0.0,0.0,1.0 } },
+		{ { -0.07,0.79,0.0 },{0.0,0.0,1.0} },
+		{ { -0.07,0.61,0.0 },{0.0,0.0,1.0} },
+		{ { 0.07, 0.79, 0.0 }, {0.0,0.0,1.0 } },
+		{ { -0.07,0.61,0.0 },{0.0,0.0,1.0} },
+		{ {0.07,0.61,0.0 },{0.0,0.0,1.0} },
+
+	// PERILLA
+		{ { -0.16,-0.15,0.0 },{0.0,0.0,0.0} },
+	{ { -0.15,-0.17,0.0 },{0.0,0.0,0.0 } },
+		{ { -0.15,-0.15,0.0 },{0.0,0.0,0.0} },
+		{ { -0.16,-0.17,0.0 },{0.0,0.0,0.0} },
+	   { { -0.15,-0.15,0.0 },{0.0,0.0,0.0} },
+		{ { -0.16,-0.15,0.0 },{0.0,0.0,0.0} },
+	};
+
+	size_t bufferSize = sizeof(vertices);
+	size_t vertexSize = sizeof(vertices[0]);
+	size_t rgbOffset = sizeof(vertices[0].m_Pos);
+
+	std::cout << "Vertices:" << std::endl;
+	std::cout << "bufferSize:" << bufferSize << std::endl;
+	std::cout << "vertexSize:" << vertexSize << std::endl;
+	std::cout << "rgbOffset:" << rgbOffset << std::endl;
 
 	// Se crea el ID del VAO
 	/*
@@ -153,9 +352,12 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 
 	// Se crea un indice para el atributo del vertice posicion, debe corresponder al location del atributo del shader
 	// indice del atributo, Cantidad de datos, Tipo de dato, Normalizacion, Tamanio del bloque (Stride), offset
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), (GLvoid*)0);
+	// vertexSIZE]= 6*sizeof(float)=24 bytes
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLvoid*)0);
 	// Se habilita el atributo del vertice con indice 0 (posicion)
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vertexSize, (GLvoid*)rgbOffset);
+	glEnableVertexAttribArray(1);
 
 	// Ya que se configuro, se regresa al estado original
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -181,7 +383,7 @@ void destroy() {
 	glBindVertexArray(VAO);
 	glDisableVertexAttribArray(0);
 
-	glBindBuffer(GL_ARRAY_BUFFER,VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glDeleteBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -227,7 +429,7 @@ void mouseButtonCallback(GLFWwindow* window, int button, int state, int mod) {
 	}
 }
 
-bool processInput(bool continueApplication){
+bool processInput(bool continueApplication) {
 	if (exitApp || glfwWindowShouldClose(window) != 0) {
 		return false;
 	}
@@ -243,12 +445,12 @@ void applicationLoop() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		// Esta linea esta comentada debido a que de momento no se usan los shaders
-		// glUseProgram(shaderProgramID);
+		glUseProgram(shaderProgramID);
 
 		// Se indica el buffer de datos y la estructura de estos utilizando solo el id del VAO
 		glBindVertexArray(VAO);
 		// Primitiva de ensamble
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0,120);
 		glBindVertexArray(0);
 
 		glfwSwapBuffers(window);
