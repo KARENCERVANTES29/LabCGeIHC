@@ -34,6 +34,8 @@ GLFWwindow * window;
 
 Shader shader;
 
+
+
 /*Sphere sphere1(20, 20);
 Cylinder cylinder1(20, 20, 0.5, 0.5);
 Box box1;*/
