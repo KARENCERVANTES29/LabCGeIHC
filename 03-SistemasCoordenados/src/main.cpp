@@ -251,5 +251,6 @@ int main(int argc, char ** argv) {
 	init(800, 700, "Window GLFW", false);
 	applicationLoop();
 	destroy();
+	
 	return 1;
 }
