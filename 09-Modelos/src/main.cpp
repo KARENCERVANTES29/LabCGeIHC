@@ -1,3 +1,6 @@
+
+
+
 #define _USE_MATH_DEFINES
 #include <cmath>
 //glew include
@@ -337,7 +340,7 @@ void init(int width, int height, std::string strTitle, bool bFullScreen) {
 	box4.init();
 	box4.setShader(&shader);
 	box4.setColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
-	// pestaÒas
+	// pesta√±as
 	cylinder3.init();
 	cylinder3.setShader(&shader);
 	cylinder3.setColor(glm::vec4(0.0, 0.0, 0.0, 0.0));
@@ -838,7 +841,7 @@ void destroy() {
 	// --------- IMPORTANTE ----------
 	// Eliminar los shader y buffers creados.
 
-	// DestrucciÛn de los VAO, EBO, VBO
+	// Destrucci√≥n de los VAO, EBO, VBO
 
 
 	shader.destroy();
@@ -1054,12 +1057,12 @@ void applicationLoop() {
 		shaderMaterialLighting.setVectorFloat3("light.specular", glm::value_ptr(glm::vec3(1.4, 1.4, 1.4)));
 
 		// Propiedades de la luz para objetos con multiples luces
-		shaderMulLighting.setVectorFloat3("viewPos", glm::value_ptr(camera->getPosition()));//aqio le movimos para bajar la intensidad de la luz
+		shaderMulLighting.setVectorFloat3("viewPos", glm::value_ptr(camera->getPosition()));
 		shaderMulLighting.setVectorFloat3("directionalLight.light.ambient", glm::value_ptr(glm::vec3(0.3, 0.3, 0.3)));
 		shaderMulLighting.setVectorFloat3("directionalLight.light.diffuse", glm::value_ptr(glm::vec3(0.4, 0.4, 0.4)));
 		shaderMulLighting.setVectorFloat3("directionalLight.light.specular", glm::value_ptr(glm::vec3(0.7, 0.7, 0.7)));
-		shaderMulLighting.setVectorFloat3("directionalLight.direction", glm::value_ptr(glm::vec3(-1.0, 0.0, 0.0))); //sentido del vector
-		//ESTO ES PARA LA LUZ SPOTLIGHT LAMPARAAAAAAAAAS
+		shaderMulLighting.setVectorFloat3("directionalLight.direction", glm::value_ptr(glm::vec3(-1.0, 0.0, 0.0))); 
+		//SPOTLIGHT
 		shaderMulLighting.setInt("spotLightCount", 1);
 		shaderMulLighting.setVectorFloat3("spotLights[0].position", glm::value_ptr(camera->getPosition()));
 		shaderMulLighting.setVectorFloat3("spotLights[0].direction", glm::value_ptr(camera->getFront()));
@@ -1068,7 +1071,7 @@ void applicationLoop() {
 		shaderMulLighting.setVectorFloat3("spotLights[0].light.specular", glm::value_ptr(glm::vec3(0.5, 0.3, 0.2)));
 		shaderMulLighting.setFloat("spotLights[0].cutOff", glm::cos(glm::radians(12.5)));
 		shaderMulLighting.setFloat("spotLights[0].outerCutOff", glm::cos(glm::radians(16.5)));
-		shaderMulLighting.setFloat("spotLights[0].constant", 1.0); //AQUI LE MUEVO PARA LA ILUMINACION
+		shaderMulLighting.setFloat("spotLights[0].constant", 1.0); 
 		shaderMulLighting.setFloat("spotLights[0].linear", 0.7);
 		shaderMulLighting.setFloat("spotLights[0].quadratic", 0.1);
 
@@ -1768,12 +1771,12 @@ void applicationLoop() {
 		//sphere2.enableWireMode();
 		sphere2.render(glm::scale(ojo, glm::vec3(0.3, 0.3, 0.1)));
 
-		//ojo2 pequeÒo parte negra
+		//ojo2 peque√±o parte negra
 		glm::mat4 ojo1 = glm::translate(model, glm::vec3(0.15, 0.15, 0.09));
 		//sphere3.enableWireMode();
 		sphere3.render(glm::scale(ojo1, glm::vec3(0.08, 0.08, 0.05)));
 
-		//ojo2 pequeÒo parte azul
+		//ojo2 peque√±o parte azul
 		glm::mat4 ojo5 = glm::translate(model, glm::vec3(0.15, 0.15, 0.08));
 		//sphere3.enableWireMode();
 		sphere6.render(glm::scale(ojo5, glm::vec3(0.15, 0.15, 0.05)));
@@ -1782,12 +1785,12 @@ void applicationLoop() {
 		glm::mat4 ojo2 = glm::translate(model, glm::vec3(-0.15, 0.15, 0.05));
 		//sphere1.enableWireMode();
 		sphere1.render(glm::scale(ojo2, glm::vec3(0.3, 0.3, 0.1)));
-		//ojo1 pequeÒo parte negra
+		//ojo1 peque√±o parte negra
 		glm::mat4 ojo3 = glm::translate(model, glm::vec3(-0.15, 0.15, 0.09));
 		//sphere3.enableWireMode();
 		sphere4.render(glm::scale(ojo3, glm::vec3(0.08, 0.08, 0.05)));
 
-		//ojo1 pequeÒo parte azul
+		//ojo1 peque√±o parte azul
 		glm::mat4 ojo4 = glm::translate(model, glm::vec3(-0.15, 0.15, 0.08));
 		//sphere3.enableWireMode();
 		sphere5.render(glm::scale(ojo4, glm::vec3(0.15, 0.15, 0.05)));
@@ -1812,7 +1815,7 @@ void applicationLoop() {
 		glm::mat4 n1 = glm::translate(boca, glm::vec3(0.0f, 0.2, 0.05));
 		cylinder1.render(glm::scale(n1, glm::vec3(0.05, 0.05, 0.2)));
 
-		//pestaÒas
+		//pesta√±as
 		glm::mat4 pe1 = glm::translate(ojo2, glm::vec3(0.0f, 0.16, 0.05));
 		cylinder3.render(glm::scale(pe1, glm::vec3(0.05, 0.05, 0.2)));
 
@@ -1822,7 +1825,7 @@ void applicationLoop() {
 		glm::mat4 pe3 = glm::translate(ojo2, glm::vec3(0.06f, 0.155, 0.05));
 		cylinder3.render(glm::scale(pe3, glm::vec3(0.05, 0.05, 0.2)));
 
-		// pestaÒas 2
+		// pesta√±as 2
 		glm::mat4 pe4 = glm::translate(ojo1, glm::vec3(0.0f, 0.16, 0.0));
 		cylinder3.render(glm::scale(pe4, glm::vec3(0.05, 0.05, 0.2)));
 
@@ -1882,7 +1885,7 @@ void applicationLoop() {
 		glm::mat4 dd10 = glm::translate(mm2, glm::vec3(0.02, 0.01, 0.0));
 		dd10 = glm::rotate(dd10, glm::radians(-130.0f), glm::vec3(0.0, 0.0, 1.0));
 		cylinder1.render(glm::scale(dd10, glm::vec3(0.009, 0.12, 0.009)));
-		// HASTA AQUÕ BOB 
+		// HASTA AQU√ç BOB 
 		// R2-D2
 			// CUERPO 
 		glm::mat4 cuerpo = glm::translate(model2, glm::vec3(3.0, 0.5, 0.0));
